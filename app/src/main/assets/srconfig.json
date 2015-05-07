@@ -1,0 +1,14 @@
+{
+  "services" : [
+    {
+      "GoogleAnalytics" : {
+        "class": "org.cocos2dx.services.GoogleAnalytics",
+        "init-config": {
+        },
+        "create-config" : {
+          "tracker-id" : "UA-171-1"
+        }
+      }
+    }
+  ]
+}
