@@ -5,3 +5,7 @@
 .DS_Store
 /build
 /captures
+*.jar
+*.war
+*.ear
+hs_err_pid*
