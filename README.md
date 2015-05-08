@@ -82,6 +82,9 @@ The following is an example for <code>functorCallback</code>
 
 class GA {
 public:
+   // functor parameters:
+   // @param event the registered event. i.e.: "GoogleAnalytics.Tick".
+   // @param params whatever object the java natvieEmit function call will pass in.
    void A( std::string event, jobject params ) { ... }
 };
 
