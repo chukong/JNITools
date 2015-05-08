@@ -85,7 +85,7 @@ public:
    void A( std::string event, jobject params ) { ... }
 };
 
-SPCallback* gg= new SPCallback( new JNIEventListener<GA>( new GA(), &GA::A ) );
+SPCallback* functorCallback= new SPCallback( new JNIEventListener<GA>( new GA(), &GA::A ) );
 
 JNIEventListener extends Functor.
 SPCallback is a shared_ptr<Functor>
