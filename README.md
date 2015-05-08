@@ -72,7 +72,7 @@ Native code registers interest in a Java event by calling:
 NativeBridge::addEventListener( "GoogleAnalytics.Tick", functorCallback );
 ```
 
-This code registers interest in having the <code>functorCallback<code> invoked whenever Java emits
+This code registers interest in having the <code>functorCallback</code> invoked whenever Java emits
 an event identified by the registered interest ( "GoogleAnalytics.Tick" in this case ).
 
 The functorCallback currently must be defined by an Object and a pointer to member.
