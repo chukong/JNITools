@@ -62,6 +62,9 @@ on the calling parameters).
 
 This system is an observer pattern where native code registers interest in an Event (defined by a
 String), and then Java can <code>emit</code> a notification back to any of the registered observers.
+
+One remarkable feature of this approach is that you don't need to declare any native method in your Java classes. Everything is wrapped inside the NativeBridge class.
+
 The process is therefore setup in two steps:
 
 ### Native
