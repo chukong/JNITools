@@ -14,8 +14,11 @@ android {
             moduleName "msgbroker"
             ldLibs "log"
             ldLibs "android"
+            cFlags "-std=c++11 -fexceptions -I /Users/ibon/applications/android-ndk/sources/cxx-stl/gnu-libstdc++/4.9/include -I /Users/ibon/applications/android-ndk/sources/cxx-stl/gnu-libstdc++/4.9/include/libs/armeabi/include"
+            stl "gnustl_shared"
         }
     }
+
     buildTypes {
         release {
             minifyEnabled false

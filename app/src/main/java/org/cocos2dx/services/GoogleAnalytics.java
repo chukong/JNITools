@@ -10,38 +10,10 @@ import org.json.JSONObject;
  *
  * Created by ibon on 5/6/15.
  */
-public class GoogleAnalytics implements Service {
+public class GoogleAnalytics extends AbstractService {
 
     public static final String TAG= "ServicesGoogleAnalytics";
     public static final String NAME= "GoogleAnalytics V4";
-
-    @Override
-    public void onPause() {
-        Log.d("Service","GA onPause");
-    }
-
-    @Override
-    public void onResume() {
-        Log.d("Service", "GA onResume");
-
-    }
-
-    @Override
-    public void onDestroy() {
-        Log.d("Service", "GA onDestroy");
-
-    }
-
-    @Override
-    public void onTrimMemory(int level) {
-        Log.d("Service", "GA onTrimMemory "+level);
-
-    }
-
-    @Override
-    public boolean initialize(JSONObject data) {
-        return false;
-    }
 
     @Override
     public String getName() {

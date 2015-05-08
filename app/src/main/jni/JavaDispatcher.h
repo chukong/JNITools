@@ -1,9 +1,9 @@
-#ifndef __JAVA_DISPATCHER_CPP
-#define __JAVA_DISPATCHER_CPP
+#ifndef __JAVA_DISPATCHER_H_
+#define __JAVA_DISPATCHER_H_
+
 
 #include "jni.h"
-
-using namespace std;
+#include <string>
 
 #define SERVICE_REGISTRY_CLASS "org/cocos2dx/csc/ServicesRegistry"
 
@@ -18,6 +18,8 @@ namespace sdkbox {
         JavaDispatcher& operator=(const JavaDispatcher&);
 
     public:
+
+        static jobject _javaServicesRegistry;
 
         static void __dispatch(
                         const char* serviceCanonicalJavaClass,
@@ -34,6 +36,11 @@ namespace sdkbox {
                         const char* className,
                         const char* methodName,
                         jobjectArray args );
+
+
+        static jobject      NewInteger( JNIEnv* env, int v );
+        static jobject      NewLong( JNIEnv* env, long v );
+        static std::string  NewStringFromJString( JNIEnv*, jstring jstr );
     };
 
 }

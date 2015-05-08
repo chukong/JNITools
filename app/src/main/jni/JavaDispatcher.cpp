@@ -3,63 +3,19 @@
 
 namespace sdkbox {
 
-static jobject _javaServicesRegistry;
+
 
 extern "C" {
-    JNIEXPORT
-    void JNICALL Java_org_cocos2dx_csc_CSC_testSendMessages(JNIEnv* env, jobject thiz) {
-
-        jclass _objClass= env->FindClass("java/lang/Object");
-        jstring _str0= env->NewStringUTF("hellou");
-        jobjectArray p0= env->NewObjectArray( 1, _objClass, _str0 );
-
-        JavaDispatcher::dispatch(
-                "org/cocos2dx/services/GoogleAnalytics",
-                "logScreen",
-                p0 );
-
-
-        jstring _str1= env->NewStringUTF("3-405683-083530-84");
-        jobjectArray p1= env->NewObjectArray( 2, _objClass, _str0 );
-        env->SetObjectArrayElement( p1, 1, _str1);
-
-        JavaDispatcher::dispatch(
-                "org/cocos2dx/services/GoogleAnalytics",
-                "logScreen2",
-                p1 );
-
-        jobjectArray p2= env->NewObjectArray( 3, _objClass, _str0 );
-        env->SetObjectArrayElement( p2, 1, _str1);
-
-        jclass integerClass= env->FindClass("java/lang/Integer");
-        jobject integer= env->NewObject(
-            integerClass,
-            env->GetMethodID( integerClass, "<init>", "(I)V"),
-            5
-        );
-        env->SetObjectArrayElement( p2, 2, integer );
-
-        JavaDispatcher::dispatch(
-                "org/cocos2dx/services/GoogleAnalytics",
-                "logScreen3",
-                p2 );
-
-        JavaDispatcher::dispatchStatic(
-            "org/cocos2dx/csc/CSC",
-            "test_call",
-            p1 );
-
-        env->DeleteLocalRef(p0);
-        env->DeleteLocalRef(_objClass);
-    }
 
     JNIEXPORT
     void JNICALL Java_org_cocos2dx_csc_ServicesRegistry_nativeInit(JNIEnv* env, jobject thiz) {
-        _javaServicesRegistry= env->NewGlobalRef( thiz );
+        JavaDispatcher::_javaServicesRegistry= env->NewGlobalRef( thiz );
         LOGD("ServiceRegistry reference set.");
     }
 
 }
+
+jobject JavaDispatcher::_javaServicesRegistry= 0;
 
 void JavaDispatcher::dispatchStatic(const char* sclass,
                                     const char* smethodName,
@@ -123,6 +79,32 @@ void JavaDispatcher::__dispatch(const char *serviceCanonicalJavaClass,
         LOGD("Failed to get jni env on dispatch.");
     }
 
+}
+
+jobject JavaDispatcher::NewInteger( JNIEnv* env, int v ) {
+    jclass typeClass= env->FindClass("java/lang/Integer");
+    jobject obj= env->NewObject( typeClass, env->GetMethodID( typeClass, "<init>", "(I)V"), jint(v) );
+    env->DeleteLocalRef( typeClass );
+
+    return obj;
+}
+
+jobject JavaDispatcher::NewLong( JNIEnv* env, long v ) {
+
+    jclass typeClass= env->FindClass("java/lang/Long");
+    jobject obj= env->NewObject( typeClass, env->GetMethodID( typeClass, "<init>", "(J)V"), jlong(v) );
+    env->DeleteLocalRef( typeClass );
+
+    return obj;
+}
+
+std::string JavaDispatcher::NewStringFromJString( JNIEnv* env, jstring jstr ) {
+
+    const char* chars = env->GetStringUTFChars(jstr, NULL);
+    std::string str(chars);
+    env->ReleaseStringUTFChars(jstr, chars);
+
+    return str;
 }
 
 }
