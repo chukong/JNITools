@@ -21,18 +21,18 @@ namespace sdkbox {
 
         static jobject _javaServicesRegistry;
 
-        static void __dispatch(
+        static jobject __dispatch(
                         const char* serviceCanonicalJavaClass,
                         const char* methodName,
                         jobjectArray args,
                         const char* servicesRegistryMethodName );
 
-        static void dispatch(
+        static jobject dispatch(
                         const char* serviceCanonicalJavaClass,
                         const char* methodName,
                         jobjectArray args );
 
-        static void dispatchStatic(
+        static jobject dispatchStatic(
                         const char* className,
                         const char* methodName,
                         jobjectArray args );

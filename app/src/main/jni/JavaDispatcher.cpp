@@ -17,26 +17,28 @@ extern "C" {
 
 jobject JavaDispatcher::_javaServicesRegistry= 0;
 
-void JavaDispatcher::dispatchStatic(const char* sclass,
+jobject JavaDispatcher::dispatchStatic(const char* sclass,
                                     const char* smethodName,
                                     jobjectArray args ) {
 
-    __dispatch( sclass, smethodName, args, "dispatchStaticMessage" );
+    return __dispatch( sclass, smethodName, args, "dispatchStaticMessage" );
 }
 
-void JavaDispatcher::dispatch(  const char* sclass,
+jobject JavaDispatcher::dispatch(  const char* sclass,
                                 const char* smethodName,
                                 jobjectArray args ) {
 
-    __dispatch( sclass, smethodName, args, "dispatchMessage" );
+    return __dispatch( sclass, smethodName, args, "dispatchMessage" );
 }
 
-void JavaDispatcher::__dispatch(const char *serviceCanonicalJavaClass,
+jobject JavaDispatcher::__dispatch(const char *serviceCanonicalJavaClass,
                                 const char *smethodName,
                                 jobjectArray args,
                                 const char* servicesRegistryMethod ) {
 
     JNIEnv *pEnv = __getJNIEnv();
+    jobject ret = NULL;
+
     if ( pEnv ) {
 
         jclass      _classId=   pEnv->FindClass(SERVICE_REGISTRY_CLASS);
@@ -53,7 +55,7 @@ void JavaDispatcher::__dispatch(const char *serviceCanonicalJavaClass,
                 jstring serviceClassName=   pEnv->NewStringUTF( serviceCanonicalJavaClass );
                 jstring methodName=         pEnv->NewStringUTF( smethodName );
 
-                jobject obj= pEnv->CallObjectMethod( _javaServicesRegistry, _methodId, serviceClassName, methodName, args );
+                ret= pEnv->CallObjectMethod( _javaServicesRegistry, _methodId, serviceClassName, methodName, args );
                 CHECK_AND_CLEAR_EXCEPTION(pEnv)
 
                 pEnv->DeleteLocalRef( methodName );
@@ -79,6 +81,7 @@ void JavaDispatcher::__dispatch(const char *serviceCanonicalJavaClass,
         LOGD("Failed to get jni env on dispatch.");
     }
 
+    return ret;
 }
 
 jobject JavaDispatcher::NewInteger( JNIEnv* env, int v ) {

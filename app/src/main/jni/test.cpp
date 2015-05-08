@@ -5,7 +5,7 @@
 
 using namespace sdkbox;
 
-class GA : public Functor {
+class GA  {
 public:
 
    void A( std::string event, jobject params ) {
