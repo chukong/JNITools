@@ -42,6 +42,26 @@ public class CSC extends ActionBarActivity {
                     Toast.makeText( CSC.this, x.getMessage(), Toast.LENGTH_LONG ).show();
                 }
 
+                new Thread() {
+                    public void run() {
+
+                        Log.d(TAG,"Emitting to native");
+                        for( int i=0; i<5; i++ ) {
+                            try {
+                                Thread.currentThread().sleep(2000);
+                            } catch(Exception x) {
+
+                            }
+                            sr.nativeEmit( "GoogleAnalytics.Tick", "msg num :"+i );
+
+                            if ( this.isInterrupted() ) {
+                                break;
+                            }
+                        }
+                        Log.d(TAG,"Done Emitting to native");
+                    }
+                }.start();
+
             }
         }.start();
 

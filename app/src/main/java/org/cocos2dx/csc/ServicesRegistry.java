@@ -3,6 +3,7 @@ package org.cocos2dx.csc;
 import android.content.Context;
 import android.util.Log;
 
+import org.cocos2dx.services.AbstractService;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -40,14 +41,15 @@ public final class ServicesRegistry {
     private HashMap<String, Service>    _services;              // initialized services.
     private Context                     _context;
     private ServicesRegistryStatus      _status= ServicesRegistryStatus.NONE;
+    private NativeBridge                _nativeBridge;
 
-    private static class ServiceInfo {
+    private class ServiceInfo {
 
         private String      name;
         private String      className;
         private JSONObject  initConfig;
         private JSONObject  createConfig;
-        private Service     service;
+        private AbstractService service;
 
         /**
          *
@@ -89,7 +91,7 @@ public final class ServicesRegistry {
             try {
 
                 Class serviceClass = Class.forName(className);
-                Constructor<Service> ctor= null;
+                Constructor<AbstractService> ctor= null;
 
                 try {
                     ctor = serviceClass.getConstructor(JSONObject.class);
@@ -103,8 +105,11 @@ public final class ServicesRegistry {
                     if (createConfig != null) {
                         Log.d(TAG, "Service '" + name + "' has create config data but no suitable constructor. Creating default.");
                     }
-                    service = (Service) serviceClass.newInstance();
+                    service = (AbstractService) serviceClass.newInstance();
                 }
+
+                service.setRegistry( ServicesRegistry.this );
+
                 Log.d(TAG, "Created Service: " + name + " with service description: '" + service.getName() + "'");
             } catch(Exception x) {
                 Log.e(TAG,"Error instantiating Service: "+className, x );
@@ -127,7 +132,7 @@ public final class ServicesRegistry {
 
         _context= ctx;
         _services= new HashMap<>();
-
+        _nativeBridge= new NativeBridge();
     }
 
     public void create() {
@@ -237,8 +242,25 @@ public final class ServicesRegistry {
         }
     }
 
+    /**
+     * dispatch a message to a registered plugin.
+     * @param serviceClass a full qualified service class
+     * @param method a class method to call to
+     */
     public void dispatchMessage( String serviceClass, String method ) {
         dispatchMessage(serviceClass, method, null);
+    }
+
+    public void nativeEmit( String event, Object params ) {
+        _nativeBridge.emit( event, params );
+    }
+
+    public void addEventListener( String event, long nativePtr ) {
+        _nativeBridge.addEventListener(event, nativePtr);
+    }
+
+    public void removeEventListener( String event, long nativePtr ) {
+        _nativeBridge.removeEventListener(event, nativePtr);
     }
 
     /**
