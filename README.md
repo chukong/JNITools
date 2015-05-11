@@ -1,6 +1,7 @@
 # How to Build.
 
 Edit build.gradle and modify cFlags to point to your NDK directory.
+
 Use AndroidStudio (tested on 1.2) to build the solution.
 
 # Cocos Service Center (CSC) Dynamic JNITools
