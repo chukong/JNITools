@@ -27,16 +27,24 @@ namespace sdkbox {
                         jobjectArray args,
                         const char* servicesRegistryMethodName );
 
-        static jobject dispatch(
+        static jobject callInService(
                         const char* serviceCanonicalJavaClass,
                         const char* methodName,
                         jobjectArray args );
 
-        static jobject dispatchStatic(
+        static jobject callStatic(
                         const char* className,
                         const char* methodName,
                         jobjectArray args );
 
+        static jobject create(
+                        const char* className,
+                        jobjectArray args );
+
+        static jobject callInInstance(
+                        jobject objRef,
+                        const char* method,
+                        jobjectArray params );
 
         static jobject      NewInteger( JNIEnv* env, int v );
         static jobject      NewLong( JNIEnv* env, long v );

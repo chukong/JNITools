@@ -10,23 +10,25 @@ namespace sdkbox {
 
     class Functor {
     public:
-        virtual void operator()( const string event, jobject params ) {
+        virtual void operator()( const string& event, jobject params ) {
         }
     };
 
     template< class T >
     class JNIEventListener : public Functor {
 
+        typedef void(T::*Method)(const string& event, jobject params );
+
     private:
         T*  _callee;
-        void(T::*_method)(const string event, jobject params);
+        Method _method;
 
     public:
 
-        JNIEventListener( T* obj, void(T::*method)( const string event, jobject params ) ) : _callee(obj), _method(method)
+        JNIEventListener( T* obj, Method method ) : _callee(obj), _method(method)
         {}
 
-        virtual void operator()( const string event, jobject params ) {
+        virtual void operator()( const string& event, jobject params ) {
 
             if ( _callee ) {
                 (_callee->*_method)(event, params);

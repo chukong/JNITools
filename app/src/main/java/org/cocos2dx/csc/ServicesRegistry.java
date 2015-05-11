@@ -252,7 +252,7 @@ public final class ServicesRegistry {
     }
 
     public void nativeEmit( String event, Object params ) {
-        _nativeBridge.emit( event, params );
+        _nativeBridge.emit(event, params);
     }
 
     public void addEventListener( String event, long nativePtr ) {
@@ -305,23 +305,10 @@ public final class ServicesRegistry {
 
             } else {
 
-                StringBuilder signature= new StringBuilder();
-
-                signature.append("'");
-                if ( null!=params ) {
-                    for (Object param : params) {
-                        signature.append(param.getClass().getCanonicalName());
-                        signature.append(" ");
-                    }
-                } else {
-                    signature.append("void");
-                }
-                signature.append("'");
-
                 Log.e( TAG,
                         "Service with class '"+serviceClass+
                         "' has no method '"+method+
-                        "' with signature "+signature.toString() );
+                        "' with signature "+getSignatureForParams(params) );
             }
 
         } else {
@@ -360,28 +347,46 @@ public final class ServicesRegistry {
 
         } else {
 
-            StringBuilder signature= new StringBuilder();
-
-            signature.append("'");
-            if ( null!=params ) {
-                for (Object param : params) {
-                    signature.append(param.getClass().getCanonicalName());
-                    signature.append(" ");
-                }
-            } else {
-                signature.append("void");
-            }
-            signature.append("'");
-
             Log.e( TAG,
                     "Static method "+method+" in class '"+className+
-                    "' has wrong signature: "+signature.toString() );
+                    "' has wrong signature: "+getSignatureForParams( params ) );
         }
 
         return ret;
     }
 
+    private String getSignatureForParams( Object[] params ) {
+
+        StringBuilder signature= new StringBuilder();
+
+        signature.append("'");
+        if ( null!=params ) {
+            for (Object param : params) {
+                signature.append(param.getClass().getCanonicalName());
+                signature.append(" ");
+            }
+        } else {
+            signature.append("void");
+        }
+        signature.append("'");
+
+        return signature.toString();
+    }
+
     private Method getMethodWithParams( Class<?> c, String method, Object[] params ) {
+
+        Method m= null;
+
+        try {
+            m= c.getDeclaredMethod(method, getParamClassForObjects( params ));
+        } catch( NoSuchMethodException e ) {
+            // eat it
+        }
+
+        return m;
+    }
+
+    private Class[] getParamClassForObjects( Object[] params ) {
 
         Class[] paramsClass= new Class[ params!=null ? params.length : 0 ];
 
@@ -415,15 +420,80 @@ public final class ServicesRegistry {
             }
         }
 
-        Method m= null;
+        return paramsClass;
+    }
 
+    Constructor getConstructorWithParams( Class<?> c, Object[] params ) {
+        Constructor ctr= null;
         try {
-            m= c.getDeclaredMethod(method, paramsClass);
-        } catch( NoSuchMethodException e ) {
+            Class[] cparams= getParamClassForObjects(params);
+            ctr = c.getDeclaredConstructor(cparams);
+        } catch(Exception x) {
             // eat it
         }
 
-        return m;
+        return ctr;
+    }
+
+    public Object createInstance( String className, Object[] params ) {
+
+        // just in case, since this method can be called from native, and native uses slash as
+        // package separators.
+        className= className.replaceAll("/",".");
+
+        Class<?> clazz;
+        try {
+            clazz= Class.forName(className);
+        } catch(Exception x) {
+            Log.e(TAG,"createInstance class.forName error "+className, x);
+            return null;
+        }
+
+        Object ret= null;
+
+        Constructor m= getConstructorWithParams(clazz, params );
+
+        if ( null!=m ) {
+
+            try {
+                m.setAccessible(true);
+                ret= m.newInstance(params);
+            } catch(Exception x ) {
+                Log.e(TAG,"Got error invoking constructor in createInstance.", x);
+            }
+
+        } else {
+
+            Log.e(  TAG,
+                    "Constructor in class '"+className+
+                    "' has wrong signature: "+getSignatureForParams(params) );
+        }
+
+        return ret;
+    }
+
+    public Object callInstance( Object instance, String method, Object[] params ) {
+
+        Object ret= null;
+        Class clazz= instance.getClass();
+
+        Method m= getMethodWithParams( clazz, method, params );
+        if ( m!=null ) {
+            try {
+                m.setAccessible(true);
+                ret= m.invoke(instance, params);
+            } catch(Exception x ) {
+                Log.d(TAG, "Failed to call instance method "+method+".");
+            }
+        } else {
+            Log.e(  TAG,
+                    "Method '"+method+ "'" +
+                    " in class '"+clazz.getCanonicalName()+"' "+
+                    " has wrong signature: '"+getSignatureForParams(params)+"'" );
+
+        }
+
+        return ret;
     }
 
     public native void nativeInit( );

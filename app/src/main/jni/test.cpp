@@ -2,13 +2,14 @@
 #include "javaenv.h"
 #include "JavaDispatcher.h"
 #include "NativeBridge.h"
+#include "Proxy.h"
 
 using namespace sdkbox;
 
 class GA  {
 public:
 
-   void A( std::string event, jobject params ) {
+   void A( const std::string& event, jobject params ) {
 
         JNIEnv *env= __getJNIEnv();
 
@@ -20,6 +21,19 @@ public:
 };
 
 extern "C" {
+
+    void JNICALL test3(JNIEnv* env, jobject thiz) {
+
+        jclass _objClass= env->FindClass("java/lang/Object");
+        jstring _str0= env->NewStringUTF("jaja");
+        jstring _str1= env->NewStringUTF("jeje");
+        jobjectArray p1= env->NewObjectArray( 2, _objClass, _str0 );
+        env->SetObjectArrayElement( p1, 1, _str1 );
+        SPProxy p= Proxy::New( "org/cocos2dx/csc/TestProxy", p1 );
+
+        jobject obj= p.get()->invoke("m1", env->NewObjectArray(0, _objClass, NULL) );
+        LOGD("Result from proxy: %s", JavaDispatcher::NewStringFromJString( env, (jstring)obj ).c_str());
+    }
 
     void JNICALL test2(JNIEnv* env, jobject thiz) {
 
@@ -34,7 +48,7 @@ extern "C" {
         jstring _str0= env->NewStringUTF("hellou");
         jobjectArray p0= env->NewObjectArray( 1, _objClass, _str0 );
 
-        JavaDispatcher::dispatch(
+        JavaDispatcher::callInService(
                 "org/cocos2dx/services/GoogleAnalytics",
                 "logScreen",
                 p0 );
@@ -44,7 +58,7 @@ extern "C" {
         jobjectArray p1= env->NewObjectArray( 2, _objClass, _str0 );
         env->SetObjectArrayElement( p1, 1, _str1);
 
-        JavaDispatcher::dispatch(
+        JavaDispatcher::callInService(
                 "org/cocos2dx/services/GoogleAnalytics",
                 "logScreen2",
                 p1 );
@@ -54,12 +68,12 @@ extern "C" {
 
         env->SetObjectArrayElement( p2, 2, JavaDispatcher::NewInteger(env,5) );
 
-        JavaDispatcher::dispatch(
+        JavaDispatcher::callInService(
                 "org/cocos2dx/services/GoogleAnalytics",
                 "logScreen3",
                 p2 );
 
-        JavaDispatcher::dispatchStatic(
+        JavaDispatcher::callStatic(
             "org/cocos2dx/csc/CSC",
             "test_call",
             p1 );
@@ -72,6 +86,7 @@ extern "C" {
     void JNICALL Java_org_cocos2dx_csc_CSC_testSendMessages(JNIEnv* env, jobject thiz) {
         test1( env, thiz );
         test2( env, thiz );
+        test3( env, thiz );
     }
 
 }
