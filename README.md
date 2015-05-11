@@ -1,4 +1,9 @@
-# Cocos Service Center (CSC) JNITools
+# How to Build.
+
+Edit build.gradle and modify cFlags to point to your NDK directory.
+Use AndroidStudio (tested on 1.2) to build the solution.
+
+# Cocos Service Center (CSC) Dynamic JNITools
 
 This project has utilities to make working with JNI more affordable.
 While it has some specific code about Cocos Service Center, like a central Services registry,
