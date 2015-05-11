@@ -18,14 +18,77 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+
 /**
+ * The ServicesRegistry is a centralized system-wide services store. It handles Service
+ * creation, initialization and lifecycle management as well as convenient mechanisms for
+ * native-to-java and java-to-native calls.
+ *
+ * The registry, first of all parses an asset file: srconfig.json, which is a configuration file
+ * for all the Services the developer wants to instantiate in the system. A sample file could be:
+ * <code>
+ *  {
+ *      "services" : [
+ *          {
+ *              "GoogleAnalytics" : {
+ *                  "class": "org.cocos2dx.services.GoogleAnalytics",
+ *                  "init-config": {
+ *                  },
+ *                  "create-config" : {
+ *                      "tracker-id" : "UA-171-1"
+ *                  }
+ *              }
+ *          }
+ *      ]
+ *  }
+ * </code>
+ *
+ * As you can see, for each plugin there's an initialization block.
+ *
+ * Each service will have a two step initialization process:
+ *   * First, services are created, and the 'create-config' block will be supplied as creation
+ *   info. The creation step does not initialize the plugin, it simply creates the instance.
+ *   * The, created services are initialized with the 'init-config' block. This is the stage
+ *   where Services start-up.
+ *
+ * Once the services are initialized, native side can dispatch calls to the Service instances
+ * by calling JavaDispatcher::callInService methods.
+ *
+ * The ServicesRegistry is connected to the Activity and listens to Activity's lifecycle, making
+ * it the Services' lifecycle. Each of the methods
+ * <code>onPause onDestroy onResume onTrimMemory</code>
+ * will be notified to the Java Services, and could as well be notified to Native should the
+ * developer need it. The way of doing this would be to call
+ * <code>NativeBridge::addEventListener</code> in native. Services lack onCreate activity
+ * callback since they will be created during activity's <code>onCreate</code> method call.
+ *
+ * The method <code>dispatchMessage</code> can be used to call a method in any registered
+ * Service object.
+ * The method <code>dispatchStaticMessage</code> can be used to call a method in any static
+ * method of an arbitrary class.
+ * The method <code>callInstance</code> can be invoked to call an arbitrary method in an object
+ * instance.
+ *
+ * All these three methods are extensively used in CSC JNI methods to have an easy
+ * native-to-java call protocol.
+ *
+ * Once a native code has registered interest in a Java-side event by calling
+ * <code>NativeBridge::addEventListener</code> the method
+ * <code>nativeEmit(String event, long ptr)</code> can be called to notify back any object to
+ * the registered observers.
+ * For this mechanism to work, the ServicesRegistry must first make a call to its method
+ * <code>public void native nativeInit</code>. This method will pass the ServicesRegistry
+ * reference to native and thus be able to have the call protocol working.
+ *
+ * Lastly, the ServicesRegistry has internal status, which will prevent from multiple initializations
+ * of the registry.
  *
  * Created by ibon on 5/6/15.
  */
 public final class ServicesRegistry {
 
-    private static final String ASSET_SRCONFIG= "srconfig.json";    // Services Registry config
-    private static final String TAG=            "ServicesRegistry";
+    private static final String ASSET_SRCONFIG=     "srconfig.json";    // Services Registry config
+    private static final String TAG=                "ServicesRegistry";
 
     private static final String JSON_CLASS=         "class";
     private static final String JSON_INIT_CONFIG=   "init-config";
@@ -342,7 +405,7 @@ public final class ServicesRegistry {
                 m.setAccessible(true);
                 ret= m.invoke( null, params);
             } catch(Exception x ) {
-                Log.e(TAG,"Got error invoking "+className+"->"+method+".", x);
+                Log.e(TAG,"Got error invoking "+className+"."+method+".", x);
             }
 
         } else {
@@ -356,6 +419,10 @@ public final class ServicesRegistry {
     }
 
     private String getSignatureForParams( Object[] params ) {
+
+        if( null==params ) {
+            return "";
+        }
 
         StringBuilder signature= new StringBuilder();
 

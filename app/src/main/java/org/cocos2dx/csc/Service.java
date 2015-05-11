@@ -2,14 +2,23 @@ package org.cocos2dx.csc;
 
 import org.json.JSONObject;
 
-import java.util.Map;
 
 /**
+ * This interface is Service's lifecycle interface.
+ * Every Service must implement this interface which connects the Service with the application
+ * lifecycle.
+ * It also defines the contract for Service initialization. The method
+ * <code>initialize( JSONObject )</code> will be automatically called by the
+ * <code>ServiceRegistry</code> with all the information set for the service in the initialization
+ * file (srconfig.json).
+ *
+ * This interface will be implemented by the <code>AbstractService</code> object which has convenience
+ * empty methods for the application lifecycle, and has Java-to-Native event emission capabilities.
+ *
  * Created by ibon on 5/6/15.
  *
  */
 public interface Service {
-
 
     /********************
      * Lifecycle

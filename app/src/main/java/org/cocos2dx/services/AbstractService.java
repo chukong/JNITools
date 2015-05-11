@@ -7,6 +7,12 @@ import org.cocos2dx.csc.ServicesRegistry;
 import org.json.JSONObject;
 
 /**
+ * The AbstractService is a convenient base class for all the Services created and initialized by
+ * the ServiceRegistry.
+ *
+ * It keeps a protected reference to the ServicesRegistry which offers Java-to-Native event
+ * emission.
+ *
  * Created by ibon on 5/8/15.
  */
 public class AbstractService implements Service {
@@ -14,7 +20,6 @@ public class AbstractService implements Service {
     protected ServicesRegistry    _registry;
 
     AbstractService() {
-
     }
 
     public void setRegistry( ServicesRegistry sr ) {

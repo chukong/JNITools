@@ -1,4 +1,4 @@
-package org.cocos2dx.csc;
+package org.cocos2dx.example;
 
 import android.util.Log;
 
@@ -20,5 +20,10 @@ public class TestProxy {
 
     public String m1() {
         return m1+"   "+m2;
+    }
+
+    public void m2() {
+        Log.d(TAG, "TestProxy m2 called.");
+
     }
 }

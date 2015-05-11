@@ -29,10 +29,15 @@ extern "C" {
         jstring _str1= env->NewStringUTF("jeje");
         jobjectArray p1= env->NewObjectArray( 2, _objClass, _str0 );
         env->SetObjectArrayElement( p1, 1, _str1 );
-        SPProxy p= Proxy::New( "org/cocos2dx/csc/TestProxy", p1 );
+        SPProxy p= Proxy::New( "org/cocos2dx/example/TestProxy", p1 );
 
+        // String m1();
         jobject obj= p.get()->invoke("m1", env->NewObjectArray(0, _objClass, NULL) );
         LOGD("Result from proxy: %s", JavaDispatcher::NewStringFromJString( env, (jstring)obj ).c_str());
+        env->DeleteLocalRef( obj );
+
+        // void m2()
+        obj= p.get()->invoke("m2", NULL );
     }
 
     void JNICALL test2(JNIEnv* env, jobject thiz) {
