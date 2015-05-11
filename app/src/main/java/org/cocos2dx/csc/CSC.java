@@ -13,12 +13,12 @@ public class CSC extends ActionBarActivity {
     private static final String TAG = "ServicesActivity";
     private ServicesRegistry sr;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         System.loadLibrary("msgbroker");
-//        nativeInit();
 
         setContentView(R.layout.activity_csc);
 

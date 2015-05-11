@@ -16,12 +16,12 @@ this as a java to native observer mechanism.
 
 ## Invoking java code from native
 
-There are two methods available:
+There are several methods available:
 
-### Service method
+### Call a Service method
 
 ``` cpp
-static jobject JavaDispatcher::dispatch(
+static jobject JavaDispatcher::callInService(
         const char* serviceCanonicalJavaClass,
         const char* methodName,
         jobjectArray args );
@@ -40,23 +40,35 @@ Primitive arguments will be boxed. It is important to note that the implementati
 primitive types in the Java side function. The boxed parameters will be automatically unboxed before
 trying to find the suitable Java method signature for the calling parameters.
 
-### Arbitrary static method
+### Call an Arbitrary static method
 
 ``` cpp
-static jobject JavaDispatcher::dispatchStatic(
+static jobject JavaDispatcher::callStatic(
         const char* className,
         const char* methodName,
         jobjectArray args );
 ```
 
 This method will invoke an arbitrary static method in any Class.
-All the parameter definitions from the <code>dispatch</code> method apply to this method as well.
-
+All the parameter definitions from the <code>call</code> method apply to this method as well.
 
 In both cases, the result of the Java method invocation is returned. The return value will be a
 jobject. In case the invoked method returned <code>void</code> or the method failed in any way
 (from finding the class, to finding the method, to not finding a suitable method to invoke based
 on the calling parameters).
+
+### Call an Object instance method
+
+```cpp
+static jobject JavaDispatcher::callInInstance(
+        jobject objRef,
+        const char* method,
+        jobjectArray params );
+```
+
+If you have an object instance reference in Native, you can call any method of such instance with
+ this method. A Java instance can be obtained by using direct JNI calls, or by creating a
+ <code>Proxy</code> object.
 
 ## Invoking native code from Java
 
@@ -109,3 +121,9 @@ servicesRegistry.nativeEmit( "GoogleAnalytics.Tick", object_param );
 ```
 
 This call will invoke all native functors associated with this event.
+
+## Helper methods
+
+To assist in building JNI types, there's the JNIUtils class. It has methods to assist in building
+the necessary <code>jobjectArray</code> for the <code>JavaDispatcher</code> calls as well as
+construction/destruction for common types.
