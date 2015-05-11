@@ -84,9 +84,6 @@ namespace sdkbox {
                         const char* method,
                         jobjectArray params );
 
-        static jobject      NewInteger( JNIEnv* env, int v );
-        static jobject      NewLong( JNIEnv* env, long v );
-        static std::string  NewStringFromJString( JNIEnv*, jstring jstr );
     };
 
 }

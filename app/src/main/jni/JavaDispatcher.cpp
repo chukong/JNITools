@@ -180,30 +180,4 @@ jobject JavaDispatcher::__dispatch(const char *serviceCanonicalJavaClass,
     return ret;
 }
 
-jobject JavaDispatcher::NewInteger( JNIEnv* env, int v ) {
-    jclass typeClass= env->FindClass("java/lang/Integer");
-    jobject obj= env->NewObject( typeClass, env->GetMethodID( typeClass, "<init>", "(I)V"), jint(v) );
-    env->DeleteLocalRef( typeClass );
-
-    return obj;
-}
-
-jobject JavaDispatcher::NewLong( JNIEnv* env, long v ) {
-
-    jclass typeClass= env->FindClass("java/lang/Long");
-    jobject obj= env->NewObject( typeClass, env->GetMethodID( typeClass, "<init>", "(J)V"), jlong(v) );
-    env->DeleteLocalRef( typeClass );
-
-    return obj;
-}
-
-std::string JavaDispatcher::NewStringFromJString( JNIEnv* env, jstring jstr ) {
-
-    const char* chars = env->GetStringUTFChars(jstr, NULL);
-    std::string str(chars);
-    env->ReleaseStringUTFChars(jstr, chars);
-
-    return str;
-}
-
 }

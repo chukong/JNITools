@@ -1,6 +1,7 @@
 #include "javaenv.h"
 #include "JavaDispatcher.h"
 #include "Proxy.h"
+#include "JNIUtils.h"
 
 using namespace sdkbox;
 
@@ -27,6 +28,11 @@ void Proxy::init( jobjectArray constructorParams ) {
     if ( _objectReference ) {
         _objectReference= __getJNIEnv()->NewGlobalRef( _objectReference );
     }
+}
+
+
+jobject Proxy::invoke( const char* method ) {
+    return invoke( method, 0 );
 }
 
 jobject Proxy::invoke( const char* method, const jobjectArray params ) {

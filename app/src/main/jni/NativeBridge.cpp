@@ -1,6 +1,7 @@
 #include "javaenv.h"
 #include "JavaDispatcher.h"
 #include "NativeBridge.h"
+#include "JNIUtils.h"
 
 using namespace std;
 
@@ -12,7 +13,7 @@ extern "C" {
         if ( objPtr!=0 ) {
 
             SPCallback* sp= reinterpret_cast<SPCallback*>(objPtr);
-            std::string sevent= JavaDispatcher::NewStringFromJString( env, event );
+            std::string sevent= JNIUtils::NewStringFromJString( env, event );
             (*(sp->get()))( sevent, params );
 
         }
