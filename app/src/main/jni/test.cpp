@@ -3,6 +3,7 @@
 #include "JavaDispatcher.h"
 #include "NativeBridge.h"
 #include "Proxy.h"
+#include "JNIUtils.h"
 
 using namespace sdkbox;
 
@@ -13,7 +14,7 @@ public:
 
         JNIEnv *env= __getJNIEnv();
 
-        std::string rec= JavaDispatcher::NewStringFromJString( env, (jstring)params );
+        std::string rec= JNIUtils::NewStringFromJString( env, (jstring)params );
 
         LOGD("GA callback event:%s recv:%s", event.c_str(), rec.c_str() );
    }
@@ -24,20 +25,21 @@ extern "C" {
 
     void JNICALL test3(JNIEnv* env, jobject thiz) {
 
-        jclass _objClass= env->FindClass("java/lang/Object");
-        jstring _str0= env->NewStringUTF("jaja");
-        jstring _str1= env->NewStringUTF("jeje");
-        jobjectArray p1= env->NewObjectArray( 2, _objClass, _str0 );
-        env->SetObjectArrayElement( p1, 1, _str1 );
-        SPProxy p= Proxy::New( "org/cocos2dx/example/TestProxy", p1 );
+        SPProxy p= Proxy::New( 
+            "org/cocos2dx/example/TestProxy",
+            JNIArray::NewFromCharPtrArrayV( env, "jaja", "jeje", NULL )->get() );
 
         // String m1();
-        jobject obj= p.get()->invoke("m1", env->NewObjectArray(0, _objClass, NULL) );
-        LOGD("Result from proxy: %s", JavaDispatcher::NewStringFromJString( env, (jstring)obj ).c_str());
-        env->DeleteLocalRef( obj );
+        jobject obj= p->invoke("m1");
+            LOGD("Result from proxy m1: %s", JNIUtils::NewStringFromJString( env, (jstring)obj ).c_str());
+            env->DeleteLocalRef( obj );
 
         // void m2()
-        obj= p.get()->invoke("m2", NULL );
+        obj= p->invoke("m2");
+
+        obj= p->invoke("m3", JNIUtils::NewArray(env, 2)->addString(env, "str").addInt(env, 23).get() );
+//            LOGD("Result from proxy m3: %d", JNIUtils.getIntValue(obj) );
+            env->DeleteLocalRef( obj );
     }
 
     void JNICALL test2(JNIEnv* env, jobject thiz) {
@@ -49,42 +51,31 @@ extern "C" {
     }
 
     void JNICALL test1(JNIEnv* env, jobject thiz) {
-        jclass _objClass= env->FindClass("java/lang/Object");
-        jstring _str0= env->NewStringUTF("hellou");
-        jobjectArray p0= env->NewObjectArray( 1, _objClass, _str0 );
 
         JavaDispatcher::callInService(
                 "org/cocos2dx/services/GoogleAnalytics",
                 "logScreen",
-                p0 );
+                JNIArray::NewFromCharPtrArrayV( env, "hellou", NULL )->get() );
 
-
-        jstring _str1= env->NewStringUTF("3-405683-083530-84");
-        jobjectArray p1= env->NewObjectArray( 2, _objClass, _str0 );
-        env->SetObjectArrayElement( p1, 1, _str1);
 
         JavaDispatcher::callInService(
                 "org/cocos2dx/services/GoogleAnalytics",
                 "logScreen2",
-                p1 );
-
-        jobjectArray p2= env->NewObjectArray( 3, _objClass, _str0 );
-        env->SetObjectArrayElement( p2, 1, _str1);
-
-        env->SetObjectArrayElement( p2, 2, JavaDispatcher::NewInteger(env,5) );
+                JNIArray::NewFromCharPtrArrayV( env, "hellou", "3-405683-083530-84", NULL )->get() );
 
         JavaDispatcher::callInService(
                 "org/cocos2dx/services/GoogleAnalytics",
                 "logScreen3",
-                p2 );
+                JNIUtils::NewArray( env, 3 )->addString(env,"str0").
+                            addString(env,"str1").
+                            addInt(env,5).
+                            get() );
 
         JavaDispatcher::callStatic(
             "org/cocos2dx/csc/CSC",
             "test_call",
-            p1 );
+            JNIArray::NewFromCharPtrArrayV( env, "calling", "CSC::test_call static method.", NULL )->get() );
 
-        env->DeleteLocalRef(p0);
-        env->DeleteLocalRef(_objClass);
     }
 
     JNIEXPORT

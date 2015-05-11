@@ -26,4 +26,9 @@ public class TestProxy {
         Log.d(TAG, "TestProxy m2 called.");
 
     }
+
+    public int m3( String s, int i ) {
+        Log.d(TAG, "TextProxy m3 with "+s+" "+i);
+        return 333;
+    }
 }

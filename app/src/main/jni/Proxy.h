@@ -43,6 +43,7 @@ protected:
 public:
     virtual ~Proxy();
 
+    virtual jobject invoke( const char* method );
     virtual jobject invoke( const char* method, const jobjectArray args );
 
     static SPProxy New( const char* clazz, jobjectArray constructorParams );
