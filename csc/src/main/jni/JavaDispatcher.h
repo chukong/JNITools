@@ -56,8 +56,8 @@ namespace sdkbox {
         JavaDispatcher& operator=(const JavaDispatcher&);
 
     public:
-
         static jobject _javaServicesRegistry;
+
 
         static jobject __dispatch(
                         const char* serviceCanonicalJavaClass,
@@ -84,6 +84,7 @@ namespace sdkbox {
                         const char* method,
                         jobjectArray params );
 
+        static jobject getService( const char* serviceClass );
     };
 
 }

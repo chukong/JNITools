@@ -29,6 +29,15 @@ jobject JNIUtils::NewLong( JNIEnv* env, long v ) {
     return obj;
 }
 
+jobject JNIUtils::NewBoolean( JNIEnv* env, bool v ) {
+
+    jclass typeClass= env->FindClass("java/lang/Boolean");
+    jobject obj= env->NewObject( typeClass, env->GetMethodID( typeClass, "<init>", "(Z)V"), jboolean(v) );
+    env->DeleteLocalRef( typeClass );
+
+    return obj;
+}
+
 std::string JNIUtils::NewStringFromJString( JNIEnv* env, jstring jstr ) {
 
     const char* chars = env->GetStringUTFChars(jstr, NULL);
@@ -52,22 +61,24 @@ jobjectArray JNIUtils::EmptyArray( JNIEnv* env ) {
     return EMPTY_ARRAY;
 }
 
-SPJNIArray JNIUtils::NewArray( JNIEnv* env, int size ) {
-    return shared_ptr<JNIArray>(new JNIArray(env, size));
-}
+
+////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////
 
 
-SPJNIArray JNIArray::NewFromStringVector( JNIEnv* env, const vector<std::string>& strings ) {
+JNIArray JNIArray::NewFromStringVector( JNIEnv* env, const vector<std::string>& strings ) {
 
-    SPJNIArray array= JNIUtils::NewArray(env, strings.size() );
+    JNIArray array(env);
     for( vector<string>::const_iterator i= strings.begin(); i!=strings.end(); ++i ) {
-        array->addString( env, (*i).c_str() );
+        array.addString( (*i).c_str() );
     }
 
     return array;
 }
 
-SPJNIArray JNIArray::NewFromCharPtrArrayV( JNIEnv* env, ... ) {
+JNIArray JNIArray::NewFromCharPtrArrayV( JNIEnv* env, ... ) {
 
     vector<const char*> elems;
 
@@ -89,80 +100,60 @@ SPJNIArray JNIArray::NewFromCharPtrArrayV( JNIEnv* env, ... ) {
     } while( 1 );
     va_end(vl);
 
-    SPJNIArray array= JNIUtils::NewArray(env, elems.size() );
+    JNIArray array(env);
     for( vector<const char*>::const_iterator i= elems.begin(); i!=elems.end(); ++i ) {
-        array->addString( env, *i );
+        array.addString( *i );
     }
 
     return array;
 
 }
 
-SPJNIArray JNIArray::NewFromCharPtrArray( JNIEnv* env, const char** strings, int numStrings ) {
+JNIArray JNIArray::NewFromCharPtrArray( JNIEnv* env, const char** strings, int numStrings ) {
 
-    SPJNIArray array= JNIUtils::NewArray(env, numStrings );
+    JNIArray array(env);
     for( int i=0; i<numStrings; i++ ) {
-        array->addString( env, strings[i] );
+        array.addString( strings[i] );
     }
 
     return array;
 }
 
-SPJNIArray JNIArray::NewFromIntVector( JNIEnv* env, const vector<int>& ints ) {
-    return shared_ptr<JNIArray>( new JNIArray(env, 0));
+JNIArray::JNIArray() : JNIArray(NULL) {
 }
 
-JNIArray::JNIArray( JNIEnv* env, int size ) : JNIArray(env,size,"Ljava/lang/Object;") {
+JNIArray::JNIArray( JNIEnv* env ) : JNIArray(env,"Ljava/lang/Object;") {
 }
 
-JNIArray::JNIArray( JNIEnv* env, int size, const char* type ) : _size(size) {
+JNIArray::JNIArray( JNIEnv* env, const char* type ) {
 
-    jclass _objClass= env->FindClass("java/lang/Object");
-    _array= (jobjectArray)env->NewGlobalRef( env->NewObjectArray( size, _objClass, 0 ) );
-    env->DeleteLocalRef(_objClass);
+    _env= __getEnv(env);
 }
 
-JNIArray& JNIArray::addString( JNIEnv* env, const std::string& sstr ) {
-
-    env= __getEnv(env);
-    jstring str= env->NewStringUTF(sstr.c_str());
-
-    env->SetObjectArrayElement( _array, _currentIndex, str );
-
-    _currentIndex++;
-
+JNIArray& JNIArray::addString( const std::string& sstr ) {
+    jstring str= _env->NewStringUTF(sstr.c_str());
+    _elems.push_back(str);
     return *this;
 }
 
-JNIArray& JNIArray::addString( JNIEnv* env, const char* sstr ) {
-
-    env= __getEnv(env);
-    jstring str= env->NewStringUTF(sstr);
-
-    env->SetObjectArrayElement( _array, _currentIndex, str );
-
-    _currentIndex++;
-
+JNIArray& JNIArray::addString( const char* sstr ) {
+    jstring str= _env->NewStringUTF(sstr);
+    _elems.push_back(str);
     return *this;
 }
 
-JNIArray& JNIArray::addInt( JNIEnv* env, int i ) {
-
-    env= __getEnv(env);
-
-    env->SetObjectArrayElement( _array, _currentIndex, JNIUtils::NewInteger(env, i) );
-    _currentIndex++;
-
+JNIArray& JNIArray::addInt( int i ) {
+    _elems.push_back( JNIUtils::NewInteger(_env, i) );
     return *this;
 }
 
-JNIArray& JNIArray::addLong( JNIEnv* env, long l ) {
+JNIArray& JNIArray::addLong( long l ) {
+    _elems.push_back(JNIUtils::NewLong(_env, l) );
+    return *this;
+}
 
-    env= __getEnv(env);
-
-    env->SetObjectArrayElement( _array, _currentIndex, JNIUtils::NewLong(env, l) );
-    _currentIndex++;
-
+JNIArray& JNIArray::addBoolean(   bool b ) {
+    _elems.push_back(JNIUtils::NewBoolean(_env, b) );
     return *this;
 }
 
@@ -181,7 +172,22 @@ JNIArray::~JNIArray() {
     }
 }
 
-jobjectArray JNIArray::get() const {
+jobjectArray JNIArray::get() {
+
+    if ( _array ) {
+        _env->DeleteGlobalRef( _array );
+    }
+
+    jclass _objClass= _env->FindClass("java/lang/Object");
+    _array= (jobjectArray)_env->NewGlobalRef( _env->NewObjectArray( _elems.size(), _objClass, 0 ) );
+    _env->DeleteLocalRef(_objClass);
+
+    int pos= 0;
+    for( vector<jobject>::const_iterator i= _elems.begin(); i!=_elems.end(); ++i ) {
+        _env->SetObjectArrayElement( _array, pos, (*i) );
+        pos++;
+    }
+
     return _array;
 }
 

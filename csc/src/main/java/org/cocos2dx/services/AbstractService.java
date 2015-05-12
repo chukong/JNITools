@@ -19,11 +19,15 @@ public class AbstractService implements Service {
 
     protected ServicesRegistry    _registry;
 
-    AbstractService() {
+    public AbstractService() {
     }
 
     public void setRegistry( ServicesRegistry sr ) {
         _registry= sr;
+    }
+
+    public ServicesRegistry getRegistry() {
+        return _registry;
     }
 
     @Override
