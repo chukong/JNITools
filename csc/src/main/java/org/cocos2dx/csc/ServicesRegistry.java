@@ -287,6 +287,10 @@ public final class ServicesRegistry {
         }
     }
 
+    public Context getContext() {
+        return _context;
+    }
+
     public void onPause() {
         for( Map.Entry<String,Service> entry : _services.entrySet() ) {
             entry.getValue().onPause();

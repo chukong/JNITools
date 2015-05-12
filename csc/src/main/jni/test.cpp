@@ -52,19 +52,21 @@ extern "C" {
 
     void JNICALL test1(JNIEnv* env, jobject thiz) {
 
+        const char* serviceClass= "org/cocos2dx/services/GoogleAnalytics";
+
         JavaDispatcher::callInService(
-                "org/cocos2dx/services/GoogleAnalytics",
+                serviceClass,
                 "logScreen",
                 JNIArray::NewFromCharPtrArrayV( env, "hellou", NULL )->get() );
 
 
         JavaDispatcher::callInService(
-                "org/cocos2dx/services/GoogleAnalytics",
+                serviceClass,
                 "logScreen2",
                 JNIArray::NewFromCharPtrArrayV( env, "hellou", "3-405683-083530-84", NULL )->get() );
 
         JavaDispatcher::callInService(
-                "org/cocos2dx/services/GoogleAnalytics",
+                serviceClass,
                 "logScreen3",
                 JNIUtils::NewArray( env, 3 )->addString(env,"str0").
                             addString(env,"str1").
@@ -72,14 +74,14 @@ extern "C" {
                             get() );
 
         JavaDispatcher::callStatic(
-            "org/cocos2dx/csc/CSC",
+            "org/cocos2dx/csc/activity/CSC",
             "test_call",
             JNIArray::NewFromCharPtrArrayV( env, "calling", "CSC::test_call static method.", NULL )->get() );
 
     }
 
     JNIEXPORT
-    void JNICALL Java_org_cocos2dx_csc_CSC_testSendMessages(JNIEnv* env, jobject thiz) {
+    void JNICALL Java_org_cocos2dx_csc_activity_CSC_testSendMessages(JNIEnv* env, jobject thiz) {
         test1( env, thiz );
         test2( env, thiz );
         test3( env, thiz );

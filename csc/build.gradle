@@ -1,21 +1,29 @@
-apply plugin: 'com.android.application'
+apply plugin: 'com.android.library'
 
 android {
     compileSdkVersion 21
     buildToolsVersion "22.0.1"
     defaultConfig {
-        applicationId "org.cocos2dx.csc"
         minSdkVersion 14
         targetSdkVersion 21
         versionCode 1
         versionName "1.0"
-
+        ndk {
+            moduleName "msgbroker"
+            ldLibs "log"
+            ldLibs "android"
+            cFlags "-std=c++11 -fexceptions -I /Users/ibon/applications/android-ndk/sources/cxx-stl/gnu-libstdc++/4.9/include -I /Users/ibon/applications/android-ndk/sources/cxx-stl/gnu-libstdc++/4.9/include/libs/armeabi/include"
+            stl "gnustl_shared"
+        }
     }
     buildTypes {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_7
     }
     productFlavors {
     }
@@ -24,6 +32,4 @@ android {
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     compile 'com.android.support:appcompat-v7:22.0.0'
-    compile project(':csc')
-    compile project(':googleanalytics')
 }

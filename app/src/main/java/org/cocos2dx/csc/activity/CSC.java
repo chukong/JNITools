@@ -1,4 +1,4 @@
-package org.cocos2dx.csc;
+package org.cocos2dx.csc.activity;
 
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
@@ -6,6 +6,8 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
+
+import org.cocos2dx.csc.ServicesRegistry;
 
 
 public class CSC extends ActionBarActivity {
@@ -20,18 +22,18 @@ public class CSC extends ActionBarActivity {
 
         System.loadLibrary("msgbroker");
 
-        setContentView(R.layout.activity_csc);
+        setContentView(org.cocos2dx.csc.activity.R.layout.activity_csc);
 
         sr= new ServicesRegistry(this);
         sr.create();
         sr.initialize();
 
         sr.dispatchMessage("kk", "kk", null);
-        sr.dispatchMessage("org.cocos2dx.services.GoogleAnalytics", "kk");
-        sr.dispatchMessage("org.cocos2dx.services.GoogleAnalytics","logScreen",null);
-        sr.dispatchMessage("org.cocos2dx.services.GoogleAnalytics","logScreen",new Object[] {"Screen"});
-        sr.dispatchMessage("org.cocos2dx.services.GoogleAnalytics","logScreen",new Object[] {"Screen", 5});
-        sr.dispatchMessage("org.cocos2dx.services.GoogleAnalytics","Ja");
+        sr.dispatchMessage("GoogleAnalyticsService", "kk");
+        sr.dispatchMessage("org.cocos2dx.services.googleanalytics.GoogleAnalyticsService","logScreen",null);
+        sr.dispatchMessage("org.cocos2dx.services.googleanalytics.GoogleAnalyticsService","logScreen",new Object[] {"Screen"});
+        sr.dispatchMessage("org.cocos2dx.services.googleanalytics.GoogleAnalyticsService","logScreen",new Object[] {"Screen", 5});
+        sr.dispatchMessage("org.cocos2dx.services.googleanalytics.GoogleAnalyticsService","Ja");
 
 
         new Thread() {
@@ -71,7 +73,7 @@ public class CSC extends ActionBarActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_csc, menu);
+        getMenuInflater().inflate(org.cocos2dx.csc.activity.R.menu.menu_csc, menu);
         return true;
     }
 
@@ -83,7 +85,7 @@ public class CSC extends ActionBarActivity {
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
+        if (id == org.cocos2dx.csc.activity.R.id.action_settings) {
             return true;
         }
 

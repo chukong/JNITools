@@ -1,4 +1,4 @@
-package cocos2dx.org.csc;
+package cocos2dx.org.csc.activity;
 
 import android.app.Application;
 import android.test.ApplicationTestCase;

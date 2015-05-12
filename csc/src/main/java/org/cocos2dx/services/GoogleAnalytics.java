@@ -2,9 +2,7 @@ package org.cocos2dx.services;
 
 import android.util.Log;
 
-import org.cocos2dx.csc.Service;
 import org.cocos2dx.csc.annotation.NativeReflection;
-import org.json.JSONObject;
 
 /**
  *
