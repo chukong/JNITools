@@ -11,38 +11,41 @@ using namespace std;
 
 namespace sdkbox {
 
-class JNIArray;
 
-typedef std::shared_ptr<JNIArray>       SPJNIArray;
-typedef std::shared_ptr<const JNIArray> CSPJNIArray;
-
+/**
+ * JNIArray helper objects are supposed to be short-lived objets.
+ * Their only motivation is to create a jobjectArray of elements, which should be immediately passed
+ * to a method call and discarded.
+ *
+ * WARNING: don't reuse JNIArray objects, the kept JNIEnv* object could be in the wrong state by the
+ *          time you decided to reuse the object.
+ */
 class JNIArray {
 
 private:
-    jobjectArray _array= 0;
-    int          _size= 0;
-    int          _currentIndex= 0;
-
-    JNIEnv* __getEnv();
+    jobjectArray    _array= 0;
+    int             _currentIndex= 0;
+    vector<jobject> _elems;
+    JNIEnv*         _env;
 
 public:
-    JNIArray( JNIEnv* env, int size );
-    JNIArray( JNIEnv* env, int size, const char* type );
+    JNIArray( );
+    JNIArray( JNIEnv* env );
+    JNIArray( JNIEnv* env, const char* type );
 
     ~JNIArray();
 
-    static SPJNIArray NewFromStringVector( JNIEnv* env, const vector<std::string>& strings );
-    static SPJNIArray NewFromCharPtrArray( JNIEnv* env, const char** strings, int numStrings );
-    static SPJNIArray NewFromCharPtrArrayV(JNIEnv* env, ... );
-    static SPJNIArray NewFromIntVector(    JNIEnv* env, const vector<int>& ints );
+    static JNIArray NewFromStringVector( JNIEnv* env, const vector<std::string>& strings );
+    static JNIArray NewFromCharPtrArray( JNIEnv* env, const char** strings, int numStrings );
+    static JNIArray NewFromCharPtrArrayV(JNIEnv* env, ... );
 
-    JNIArray& addString(    JNIEnv* env, const std::string& str );
-    JNIArray& addString(    JNIEnv* env, const char* str );
-    JNIArray& addInt(       JNIEnv* env, int i );
-    JNIArray& addLong(      JNIEnv* env, long l );
-    JNIArray& addBoolean(   JNIEnv* env, bool b );
+    JNIArray& addString(    const std::string& str );
+    JNIArray& addString(    const char* str );
+    JNIArray& addInt(       int i );
+    JNIArray& addLong(      long l );
+    JNIArray& addBoolean(   bool b );
 
-    jobjectArray get() const;
+    jobjectArray get();
 
     JNIEnv* __getEnv( JNIEnv* env );
 };
@@ -59,14 +62,12 @@ private:
     static jobjectArray EMPTY_ARRAY;
 public:
 
-    static jobject NewInteger(          JNIEnv* env, int v );
-    static jobject NewLong(             JNIEnv* env, long v );
-    static string NewStringFromJString( JNIEnv* env, jstring jstr );
-    static SPJNIArray NewArray(         JNIEnv* env, int size );
-
-    static int getIntValue(             JNIEnv* env, jobject obj );
-
-    static jobjectArray EmptyArray( JNIEnv* env );
+    static jobject NewInteger(           JNIEnv* env, int v );
+    static jobject NewLong(              JNIEnv* env, long v );
+    static jobject NewBoolean(           JNIEnv* env, bool v );
+    static string  NewStringFromJString( JNIEnv* env, jstring jstr );
+    static int     getIntValue(          JNIEnv* env, jobject obj );
+    static jobjectArray EmptyArray(      JNIEnv* env );
 };
 
 

@@ -1,5 +1,6 @@
 #include "javaenv.h"
 #include "JavaDispatcher.h"
+#include "JNIUtils.h"
 
 namespace sdkbox {
 
@@ -178,6 +179,13 @@ jobject JavaDispatcher::__dispatch(const char *serviceCanonicalJavaClass,
     }
 
     return ret;
+}
+
+jobject JavaDispatcher::getService( const char* serviceClass ) {
+    return JavaDispatcher::callInInstance(
+        _javaServicesRegistry,
+        "getService",
+        JNIArray().addString(serviceClass).get() );
 }
 
 }

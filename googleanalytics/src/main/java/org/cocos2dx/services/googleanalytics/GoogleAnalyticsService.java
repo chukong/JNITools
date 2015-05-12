@@ -18,7 +18,7 @@ import java.util.Map;
  */
 public class GoogleAnalyticsService extends AbstractService implements IGoogleAnalyticsService {
 
-    public static final String PLUGIN_LOG_TAG="ServiceGoogleAnalytics";
+    public static final String PLUGIN_LOG_TAG="ServicesGoogleAnalytics";
 
     private static final String ERROR_NO_TRACKER_ID=    "No Tracker ID found in plugin config.";
     private static final String ERROR_TRACKER=          " called w/o valid tracker.";
@@ -39,7 +39,7 @@ public class GoogleAnalyticsService extends AbstractService implements IGoogleAn
     private Tracker             tracker=    null;
     private Map<String,Tracker> trackers=   null;
 
-    public GoogleAnalyticsService() {
+    public GoogleAnalyticsService( JSONObject createConfig ) {
         super();
     }
 
@@ -60,6 +60,8 @@ public class GoogleAnalyticsService extends AbstractService implements IGoogleAn
                 trackers.put(trackerId, tracker);
 
                 startSession();
+
+                Log.d(PLUGIN_LOG_TAG, "Google analytics initialized.");
             }
 
         } catch(Exception x ) {

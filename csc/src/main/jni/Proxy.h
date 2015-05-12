@@ -1,5 +1,5 @@
-#ifndef __PROXY_X
-#define __PROXY_h
+#ifndef __PROXY_SERVICE_PROXY_H
+#define __PROXY_SERVICE_PROXY_H
 
 #include "jni.h"
 #include <memory>
@@ -36,6 +36,7 @@ protected:
     jobject     _objectReference;
     const char* _class;
 
+    Proxy();
     Proxy( const char* clazz );
 
     virtual void init( jobjectArray constructorParams );
@@ -43,12 +44,23 @@ protected:
 public:
     virtual ~Proxy();
 
-    virtual jobject invoke( const char* method );
-    virtual jobject invoke( const char* method, const jobjectArray args );
+    virtual jobject invoke( const char* method ) const;
+    virtual jobject invoke( const char* method, int i ) const;
+    virtual jobject invoke( const char* method, bool b ) const;
+    virtual jobject invoke( const char* method, const std::string& s ) const;
+    virtual jobject invoke( const char* method, const char* s ) const;
+    virtual jobject invoke( const char* method, const jobjectArray args ) const;
 
     static SPProxy New( const char* clazz, jobjectArray constructorParams );
 };
 
+class ServiceProxy : public Proxy {
+
+public:
+    ServiceProxy( const char* serviceClass );
+    virtual ~ServiceProxy();
+
+};
 
 }
 

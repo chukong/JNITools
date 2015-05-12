@@ -4,6 +4,7 @@
 #include "NativeBridge.h"
 #include "Proxy.h"
 #include "JNIUtils.h"
+#include "GoogleAnalyticsProxy.h"
 
 using namespace sdkbox;
 
@@ -23,11 +24,17 @@ public:
 
 extern "C" {
 
+    void JNICALL test4(JNIEnv* env, jobject thiz) {
+
+        GoogleAnalyticsProxy sp;
+        sp.logScreen("Screen test jni 4");
+    }
+
     void JNICALL test3(JNIEnv* env, jobject thiz) {
 
         SPProxy p= Proxy::New( 
             "org/cocos2dx/example/TestProxy",
-            JNIArray::NewFromCharPtrArrayV( env, "jaja", "jeje", NULL )->get() );
+            JNIArray::NewFromCharPtrArrayV( env, "jaja", "jeje", NULL ).get() );
 
         // String m1();
         jobject obj= p->invoke("m1");
@@ -37,7 +44,7 @@ extern "C" {
         // void m2()
         obj= p->invoke("m2");
 
-        obj= p->invoke("m3", JNIUtils::NewArray(env, 2)->addString(env, "str").addInt(env, 23).get() );
+        obj= p->invoke("m3", JNIArray(env).addString("str").addInt(23).get() );
 //            LOGD("Result from proxy m3: %d", JNIUtils.getIntValue(obj) );
             env->DeleteLocalRef( obj );
     }
@@ -57,26 +64,27 @@ extern "C" {
         JavaDispatcher::callInService(
                 serviceClass,
                 "logScreen",
-                JNIArray::NewFromCharPtrArrayV( env, "hellou", NULL )->get() );
+                JNIArray::NewFromCharPtrArrayV( env, "hellou", NULL ).get() );
 
 
         JavaDispatcher::callInService(
                 serviceClass,
                 "logScreen2",
-                JNIArray::NewFromCharPtrArrayV( env, "hellou", "3-405683-083530-84", NULL )->get() );
+                JNIArray::NewFromCharPtrArrayV( env, "hellou", "3-405683-083530-84", NULL ).get() );
 
         JavaDispatcher::callInService(
                 serviceClass,
                 "logScreen3",
-                JNIUtils::NewArray( env, 3 )->addString(env,"str0").
-                            addString(env,"str1").
-                            addInt(env,5).
+                JNIArray( env ).
+                            addString("str0").
+                            addString("str1").
+                            addInt(5).
                             get() );
 
         JavaDispatcher::callStatic(
             "org/cocos2dx/csc/activity/CSC",
             "test_call",
-            JNIArray::NewFromCharPtrArrayV( env, "calling", "CSC::test_call static method.", NULL )->get() );
+            JNIArray::NewFromCharPtrArrayV( env, "calling", "CSC::test_call static method.", NULL ).get() );
 
     }
 
@@ -85,6 +93,7 @@ extern "C" {
         test1( env, thiz );
         test2( env, thiz );
         test3( env, thiz );
+        test4( env, thiz );
     }
 
 }

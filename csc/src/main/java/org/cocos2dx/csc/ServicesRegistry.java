@@ -548,13 +548,13 @@ public final class ServicesRegistry {
         Object ret= null;
         Class clazz= instance.getClass();
 
-        Method m= getMethodWithParams( clazz, method, params );
+        Method m= getMethodWithParams(clazz, method, params);
         if ( m!=null ) {
             try {
                 m.setAccessible(true);
                 ret= m.invoke(instance, params);
             } catch(Exception x ) {
-                Log.d(TAG, "Failed to call instance method "+method+".");
+                Log.d(TAG, "Failed to call instance method " + method + ".");
             }
         } else {
             Log.e(  TAG,
@@ -565,6 +565,11 @@ public final class ServicesRegistry {
         }
 
         return ret;
+    }
+
+    public Service getService( String serviceClass ) {
+        serviceClass= serviceClass.replace('/','.');
+        return _services.get(serviceClass);
     }
 
     public native void nativeInit( );

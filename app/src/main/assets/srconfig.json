@@ -4,9 +4,9 @@
       "GoogleAnalytics" : {
         "class": "org.cocos2dx.services.googleanalytics.GoogleAnalyticsService",
         "init-config": {
+          "tracker-id" : "UA-17485141-7"
         },
         "create-config" : {
-          "tracker-id" : "UA-17485141-7"
         }
       }
     }

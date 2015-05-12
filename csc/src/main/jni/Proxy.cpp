@@ -7,7 +7,13 @@ using namespace sdkbox;
 
 namespace sdkbox {
 
-Proxy::Proxy( const char* clazz ) : _class(clazz), _objectReference(0) {
+Proxy::Proxy() : Proxy(NULL) {
+}
+
+Proxy::Proxy( const char* clazz ) : _objectReference(0) {
+    if ( clazz ) {
+        _class= strdup(clazz);
+    }
 }
 
 Proxy::~Proxy() {
@@ -31,13 +37,50 @@ void Proxy::init( jobjectArray constructorParams ) {
 }
 
 
-jobject Proxy::invoke( const char* method ) {
-    return invoke( method, 0 );
+jobject Proxy::invoke( const char* method ) const {
+    return invoke( method, jobjectArray(0) );
 }
 
-jobject Proxy::invoke( const char* method, const jobjectArray params ) {
+jobject Proxy::invoke( const char* method, const jobjectArray params ) const {
 
-    JavaDispatcher::callInInstance( _objectReference, method, params );
+    if ( _objectReference ) {
+        return JavaDispatcher::callInInstance( _objectReference, method, params );
+    }
+
+    LOGD("Invoking method %s with no object instance.", method);
+
+    return NULL;
 }
+
+jobject Proxy::invoke( const char* method, int i ) const {
+    return invoke( method, JNIArray(NULL).addInt(i).get() );
+}
+
+jobject Proxy::invoke( const char* method, bool b ) const {
+    return invoke( method, JNIArray(NULL).addBoolean(b).get() );
+}
+
+jobject Proxy::invoke( const char* method, const std::string& s ) const {
+    return invoke( method, JNIArray(NULL).addString(s).get() );
+}
+
+jobject Proxy::invoke( const char* method, const char * s ) const {
+    return invoke( method, JNIArray(NULL).addString(s).get() );
+}
+
+
+
+ServiceProxy::ServiceProxy( const char* serviceClass ) {
+    _objectReference= (jobject)__getJNIEnv()->NewGlobalRef( JavaDispatcher::getService( serviceClass ) );
+    if ( _objectReference ) {
+        LOGD("Got service reference for class: %s.", serviceClass );
+    } else {
+        LOGD("ERROR: NO service reference for class: %s.", serviceClass );
+    }
+}
+
+ServiceProxy::~ServiceProxy() {
+}
+
 
 }
