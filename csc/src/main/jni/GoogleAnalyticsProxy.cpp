@@ -1,6 +1,7 @@
 
 #include "jni.h"
 #include "GoogleAnalyticsProxy.h"
+#include "NativeBridge.h"
 #include "JNIUtils.h"
 #include <string>
 #include <memory>
@@ -9,10 +10,34 @@ namespace sdkbox {
 
 typedef const std::string cstr;
 
+
+void GoogleAnalyticsCallback::onEvent1( cstr& event, jobject params ) {
+    LOGD("GoogleAnalytics event1");
+}
+
+void GoogleAnalyticsCallback::onEvent2( cstr& event, jobject params ) {
+    LOGD("GoogleAnalytics event2");
+}
+
 GoogleAnalyticsProxy::GoogleAnalyticsProxy() : ServiceProxy("org/cocos2dx/services/googleanalytics/GoogleAnalyticsService") {
+
+    _callbackObj= new GoogleAnalyticsCallback();
+
+    _callbackEvent1= NativeBridge<GoogleAnalyticsCallback>::AddEventListener(
+        "GoogleAnalytics.event1",
+        _callbackObj,
+        &GoogleAnalyticsCallback::onEvent1);
+
+    _callbackEvent2= NativeBridge<GoogleAnalyticsCallback>::AddEventListener(
+        "GoogleAnalytics.event2",
+        _callbackObj,
+        &GoogleAnalyticsCallback::onEvent2);
 }
 
 GoogleAnalyticsProxy::~GoogleAnalyticsProxy() {
+    NativeBridge<GoogleAnalyticsCallback>::RemoveEventListener("GoogleAnalytics.event1",_callbackEvent1.get());
+    NativeBridge<GoogleAnalyticsCallback>::RemoveEventListener("GoogleAnalytics.event2",_callbackEvent2.get());
+    delete _callbackObj;
 }
 
 void GoogleAnalyticsProxy::dispatchHits() const {
@@ -36,50 +61,45 @@ void GoogleAnalyticsProxy::stopSession() const {
 }
 
 void GoogleAnalyticsProxy::logScreen( cstr& title) const {
-LOGD(" ----logScreen");
     invoke( "logScreen", title );
 }
 
-void GoogleAnalyticsProxy::logEvent( cstr& eventCategory, cstr eventAction, cstr eventLabel, long value) const {
+void GoogleAnalyticsProxy::logEvent( cstr& eventCategory, cstr& eventAction, cstr& eventLabel, long value) const {
     invoke(
         "logEvent",
-        JNIArray(NULL).
+        JNIArray().
             addString(eventCategory).
             addString(eventAction).
             addString(eventLabel).
-            addLong(value).
-            get() );
+            addLong(value) );
 }
 
 void GoogleAnalyticsProxy::logException( cstr& exceptionDescription, bool isFatal) const {
     invoke(
         "logException",
-        JNIArray(NULL).
+        JNIArray().
             addString(exceptionDescription).
-            addBoolean(isFatal).
-            get() );
+            addBoolean(isFatal) );
 }
 
 void GoogleAnalyticsProxy::logTiming( cstr& timingCategory, long timingInterval, cstr& timingName, cstr& timingLabel) const {
     invoke(
         "logTiming",
-        JNIArray(NULL).
+        JNIArray().
             addString(timingCategory).
             addLong(timingInterval).
             addString(timingName).
-            addString(timingLabel).
-            get() );
+            addString(timingLabel) );
 
 }
 
 void GoogleAnalyticsProxy::logSocial( cstr& socialNetwork, cstr&socialAction, cstr& socialTarget) const {
     invoke(
         "logSocial",
-        JNIArray(NULL).
+        JNIArray().
             addString(socialNetwork).
             addString(socialAction).
-            addString(socialTarget).
-            get() );
+            addString(socialTarget) );
 }
 
 void GoogleAnalyticsProxy::setDryRun( bool dr ) const {
@@ -96,6 +116,19 @@ void GoogleAnalyticsProxy::createTracker( cstr& trackerId ) const {
 
 void GoogleAnalyticsProxy::enableTracker( cstr& trackerId ) const {
     invoke( "enableTracker", trackerId );
+}
+
+int GoogleAnalyticsProxy::getInt() const {
+    return invokeInt( "getInt" );
+}
+long GoogleAnalyticsProxy::getLong() const {
+    return invokeLong( "getLong" );
+}
+string GoogleAnalyticsProxy::getString() const {
+    return invokeString( "getString" );
+}
+bool GoogleAnalyticsProxy::getBoolean() const {
+    return invokeBoolean( "getBoolean" );
 }
 
 }

@@ -38,6 +38,28 @@ jobject JNIUtils::NewBoolean( JNIEnv* env, bool v ) {
     return obj;
 }
 
+int JNIUtils::GetInt( JNIEnv* env, jobject o ) {
+    jclass typeClass= env->FindClass("java/lang/Integer");
+    int ret= (int)env->CallIntMethod( o, env->GetMethodID( typeClass, "intValue", "()I") );
+    env->DeleteLocalRef( typeClass );
+
+    return ret;
+}
+
+long JNIUtils::GetLong( JNIEnv* env, jobject o ) {
+    jclass typeClass= env->FindClass("java/lang/Long");
+    long ret= (long)env->CallLongMethod( o, env->GetMethodID( typeClass, "longValue", "()J") );
+    env->DeleteLocalRef( typeClass );
+    return ret;
+}
+
+bool JNIUtils::GetBoolean( JNIEnv* env, jobject o ) {
+    jclass typeClass= env->FindClass("java/lang/Boolean");
+    bool ret= (bool)env->CallBooleanMethod( o, env->GetMethodID( typeClass, "booleanValue", "()Z") );
+    env->DeleteLocalRef( typeClass );
+    return ret;
+}
+
 std::string JNIUtils::NewStringFromJString( JNIEnv* env, jstring jstr ) {
 
     const char* chars = env->GetStringUTFChars(jstr, NULL);
@@ -45,10 +67,6 @@ std::string JNIUtils::NewStringFromJString( JNIEnv* env, jstring jstr ) {
     env->ReleaseStringUTFChars(jstr, chars);
 
     return str;
-}
-
-int JNIUtils::getIntValue( JNIEnv* env, jobject obj ) {
-
 }
 
 jobjectArray JNIUtils::EmptyArray( JNIEnv* env ) {

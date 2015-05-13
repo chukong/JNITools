@@ -26,8 +26,13 @@ extern "C" {
 
     void JNICALL test4(JNIEnv* env, jobject thiz) {
 
-        GoogleAnalyticsProxy sp;
-        sp.logScreen("Screen test jni 4");
+        GoogleAnalyticsProxy* sp= new GoogleAnalyticsProxy();
+        sp->logScreen("Screen test jni 4");
+
+        LOGD("calling getInt %d", sp->getInt());
+        LOGD("calling getLong %ld", sp->getLong());
+        LOGD("calling getBoolean %d", sp->getBoolean());
+        LOGD("calling getString %s", sp->getString().c_str());
     }
 
     void JNICALL test3(JNIEnv* env, jobject thiz) {
@@ -51,10 +56,14 @@ extern "C" {
 
     void JNICALL test2(JNIEnv* env, jobject thiz) {
 
-        SPCallback* gg= new SPCallback( new JNIEventListener<GA>( new GA(), &GA::A ) );
-        // BUGBUG leaking
-        NativeBridge::addEventListener( "GoogleAnalytics.Tick", gg );
+        // BUGBUG leaking. in other examples, keep the GA instance and SPCallback safe.
+        SPCallback sp= NativeBridge<GA>::AddEventListener( "GoogleAnalytics.Tick", new GA(), &GA::A );
 
+        typedef struct {
+            SPCallback sp;
+        } ss;
+        ss* s= new ss();
+        s->sp= sp;
     }
 
     void JNICALL test1(JNIEnv* env, jobject thiz) {
