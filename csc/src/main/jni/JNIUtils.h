@@ -62,12 +62,16 @@ private:
     static jobjectArray EMPTY_ARRAY;
 public:
 
-    static jobject NewInteger(           JNIEnv* env, int v );
-    static jobject NewLong(              JNIEnv* env, long v );
-    static jobject NewBoolean(           JNIEnv* env, bool v );
-    static string  NewStringFromJString( JNIEnv* env, jstring jstr );
-    static int     getIntValue(          JNIEnv* env, jobject obj );
-    static jobjectArray EmptyArray(      JNIEnv* env );
+    static jobject  NewInteger(           JNIEnv* env, int v );
+    static jobject  NewLong(              JNIEnv* env, long v );
+    static jobject  NewBoolean(           JNIEnv* env, bool v );
+    static string   NewStringFromJString( JNIEnv* env, jstring jstr );
+
+    static int      GetInt(               JNIEnv* env, jobject o );
+    static long     GetLong(              JNIEnv* env, jobject o );
+    static bool     GetBoolean(           JNIEnv* env, jobject o );
+
+    static jobjectArray EmptyArray(       JNIEnv* env );
 };
 
 

@@ -1,8 +1,9 @@
 #ifndef __PROXY_SERVICE_PROXY_H
 #define __PROXY_SERVICE_PROXY_H
 
-#include "jni.h"
 #include <memory>
+#include "jni.h"
+#include "JNIUtils.h"
 
 using namespace std;
 
@@ -46,10 +47,21 @@ public:
 
     virtual jobject invoke( const char* method ) const;
     virtual jobject invoke( const char* method, int i ) const;
+    virtual jobject invoke( const char* method, JNIArray& params ) const;
     virtual jobject invoke( const char* method, bool b ) const;
     virtual jobject invoke( const char* method, const std::string& s ) const;
     virtual jobject invoke( const char* method, const char* s ) const;
+
     virtual jobject invoke( const char* method, const jobjectArray args ) const;
+
+    virtual int     invokeInt( const char* method ) const { invokeInt( method, NULL ); }
+    virtual int     invokeInt( const char* method, const jobjectArray args ) const;
+    virtual long    invokeLong( const char* method ) const { invokeLong( method, NULL ); }
+    virtual long    invokeLong( const char* method, const jobjectArray args ) const;
+    virtual string  invokeString( const char* method ) const { invokeString( method, NULL ); }
+    virtual string  invokeString( const char* method, const jobjectArray args ) const;
+    virtual bool    invokeBoolean( const char* method ) const { invokeBoolean( method, NULL ); }
+    virtual bool    invokeBoolean( const char* method, const jobjectArray args ) const;
 
     static SPProxy New( const char* clazz, jobjectArray constructorParams );
 };

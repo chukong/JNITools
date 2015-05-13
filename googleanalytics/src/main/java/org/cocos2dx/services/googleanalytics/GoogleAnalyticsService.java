@@ -245,4 +245,8 @@ public class GoogleAnalyticsService extends AbstractService implements IGoogleAn
         return "GoogleAnalytics V4";
     }
 
+    public int getInt() { return 5; }
+    public long getLong() { return 55L; }
+    public boolean getBoolean() { return true; }
+    public String getString() { return "qwopieurqopiweru02357092384578975349803450879325"; }
 }

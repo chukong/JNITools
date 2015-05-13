@@ -52,23 +52,65 @@ jobject Proxy::invoke( const char* method, const jobjectArray params ) const {
     return NULL;
 }
 
+int     Proxy::invokeInt( const char* method, const jobjectArray args ) const {
+    jobject obj= invoke( method, args );
+    if ( obj ) {
+        return JNIUtils::GetInt(__getJNIEnv(), obj);
+    }
+
+    return 0;
+}
+
+long    Proxy::invokeLong( const char* method, const jobjectArray args ) const {
+    jobject obj= invoke( method, args );
+    if ( obj ) {
+        return JNIUtils::GetLong(__getJNIEnv(), obj);
+    }
+
+    return 0L;
+}
+
+bool    Proxy::invokeBoolean( const char* method, const jobjectArray args ) const {
+    jobject obj= invoke( method, args );
+    if ( obj ) {
+        return JNIUtils::GetBoolean(__getJNIEnv(), obj);
+    }
+
+    return false;
+}
+
+string  Proxy::invokeString( const char* method, const jobjectArray args ) const {
+    jobject obj= invoke( method, args );
+    if ( obj ) {
+        return JNIUtils::NewStringFromJString(__getJNIEnv(), (jstring)obj);
+    }
+
+    return "";
+}
+
+
+
+
+
 jobject Proxy::invoke( const char* method, int i ) const {
-    return invoke( method, JNIArray(NULL).addInt(i).get() );
+    return invoke( method, JNIArray().addInt(i) );
 }
 
 jobject Proxy::invoke( const char* method, bool b ) const {
-    return invoke( method, JNIArray(NULL).addBoolean(b).get() );
+    return invoke( method, JNIArray().addBoolean(b) );
 }
 
 jobject Proxy::invoke( const char* method, const std::string& s ) const {
-    return invoke( method, JNIArray(NULL).addString(s).get() );
+    return invoke( method, JNIArray().addString(s) );
 }
 
 jobject Proxy::invoke( const char* method, const char * s ) const {
-    return invoke( method, JNIArray(NULL).addString(s).get() );
+    return invoke( method, JNIArray().addString(s) );
 }
 
-
+jobject Proxy::invoke( const char* method, JNIArray& params ) const {
+    return invoke( method, params.get() );
+}
 
 ServiceProxy::ServiceProxy( const char* serviceClass ) {
     _objectReference= (jobject)__getJNIEnv()->NewGlobalRef( JavaDispatcher::getService( serviceClass ) );

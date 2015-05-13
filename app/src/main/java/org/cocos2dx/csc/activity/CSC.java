@@ -55,6 +55,7 @@ public class CSC extends ActionBarActivity {
 
                             }
                             sr.nativeEmit( "GoogleAnalytics.Tick", "msg num :"+i );
+                            sr.nativeEmit( "GoogleAnalytics.event1", "msg num :"+(i*2) );
 
                             if ( this.isInterrupted() ) {
                                 break;
